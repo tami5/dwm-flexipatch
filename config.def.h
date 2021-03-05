@@ -52,6 +52,14 @@ static const int focusonwheel            = 0;
 static int floatposgrid_x                = 5;  /* float grid columns */
 static int floatposgrid_y                = 5;  /* float grid rows */
 #endif // FLOATPOS_PATCH
+#if RIODRAW_PATCH
+static const char slopspawnstyle[]       = "-t 0 -c 0.92,0.85,0.69,0.3 -o"; /* do NOT define -f (format) here */
+static const char slopresizestyle[]      = "-t 0 -c 0.92,0.85,0.69,0.3"; /* do NOT define -f (format) here */
+static const int riodraw_borders         = 0;  /* 0 or 1, indicates whether the area drawn using slop includes the window borders */
+#if SWALLOW_PATCH
+static const int riodraw_matchpid        = 1;  /* 0 or 1, indicates whether to match the PID of the client that was spawned with riospawn */
+#endif // SWALLOW_PATCH
+#endif // RIODRAW_PATCH
 #if BAR_STATUSPADDING_PATCH
 static const int horizpadbar             = 2;   /* horizontal padding for statusbar */
 static const int vertpadbar              = 0;   /* vertical padding for statusbar */
@@ -95,13 +103,12 @@ static const char dmenufont[]            = "MesloLGSDZ Nerd Font:size=9:antialia
 static char c000000[]                    = "#000000"; // placeholder value
 #endif // BAR_FLEXWINTITLE_PATCH
 static char normbordercolor[]            = "#303030";
+static char normbgcolor[]                = "#121212";
+static char normfgcolor[]                = "#d1d1d1";
 static char normfloatcolor[]             = "#db8fd9";
 
-static char normfgcolor[]                = "#d1d1d1";
-static char normbgcolor[]                = "#121212";
 static char selbgcolor[]                 = "#121212";
 static char selfgcolor[]                 = "#ffffff";
-
 static char selbordercolor[]             = "#ababab";
 static char selfloatcolor[]              = "#121212";
 
@@ -297,6 +304,10 @@ static char *statuscolors[][ColCount] = {
 	[SchemeUrg]          = { urgfgcolor,       urgbgcolor,       urgbordercolor,       urgfloatcolor },
 };
 #endif // BAR_POWERLINE_STATUS_PATCH
+
+#if BAR_LAYOUTMENU_PATCH
+static const char *layoutmenu_cmd = "layoutmenu.sh";
+#endif
 
 #if COOL_AUTOSTART_PATCH
 static const char *const autostart[] = {
@@ -513,95 +524,102 @@ static const int decorhints  = 1;    /* 1 means respect decoration hints */
 #define FORCE_VSPLIT 1
 #endif
 
-/* #if FLEXTILE_DELUXE_LAYOUT */
-/* static const Layout layouts[] = { */
-/* 	/1* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } *1/ */
-/* 	{ "[]=",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout */
-/*  	{ "><>",      NULL,             {0} },    /1* no layout function means floating behavior *1/ */
-/* 	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, 0, 0, NULL } }, // monocle */
-/* 	{ "|||",      flextile,         { -1, -1, SPLIT_VERTICAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, NULL } }, // columns (col) layout */
-/* 	{ ">M>",      flextile,         { -1, -1, FLOATING_MASTER, LEFT_TO_RIGHT, LEFT_TO_RIGHT, 0, NULL } }, // floating master */
-/* 	{ "[D]",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck */
-/* 	{ "TTT",      flextile,         { -1, -1, SPLIT_HORIZONTAL, LEFT_TO_RIGHT, LEFT_TO_RIGHT, 0, NULL } }, // bstack */
-/* 	{ "===",      flextile,         { -1, -1, SPLIT_HORIZONTAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, NULL } }, // bstackhoriz */
-/* 	{ "|M|",      flextile,         { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, TOP_TO_BOTTOM, NULL } }, // centeredmaster */
-/* 	{ ":::",      flextile,         { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid */
-/* 	{ "[\\]",     flextile,         { -1, -1, NO_SPLIT, DWINDLE, 0, 0, NULL } }, // fibonacci dwindle */
-/* 	{ "(@)",      flextile,         { -1, -1, NO_SPLIT, SPIRAL, 0, 0, NULL } }, // fibonacci spiral */
-/* 	#if TILE_LAYOUT */
-/* 	{ "[]=",      tile,             {0} }, */
-/* 	#endif */
-/* 	#if MONOCLE_LAYOUT */
-/* 	{ "[M]",      monocle,          {0} }, */
-/* 	#endif */
-/* 	#if BSTACK_LAYOUT */
-/* 	{ "TTT",      bstack,           {0} }, */
-/* 	#endif */
-/* 	#if BSTACKHORIZ_LAYOUT */
-/* 	{ "===",      bstackhoriz,      {0} }, */
-/* 	#endif */
-/* 	#if CENTEREDMASTER_LAYOUT */
-/* 	{ "|M|",      centeredmaster,   {0} }, */
-/* 	#endif */
-/* 	#if CENTEREDFLOATINGMASTER_LAYOUT */
-/* 	{ ">M>",      centeredfloatingmaster, {0} }, */
-/* 	#endif */
-/* 	#if COLUMNS_LAYOUT */
-/* 	{ "|||",      col,              {0} }, */
-/* 	#endif */
-/* 	#if DECK_LAYOUT */
-/* 	{ "[D]",      deck,             {0} }, */
-/* 	#endif */
-/* 	#if FIBONACCI_SPIRAL_LAYOUT */
-/* 	{ "(@)",      spiral,           {0} }, */
-/* 	#endif */
-/* 	#if FIBONACCI_DWINDLE_LAYOUT */
-/* 	{ "[\\]",     dwindle,          {0} }, */
-/* 	#endif */
-/* 	#if GRIDMODE_LAYOUT */
-/* 	{ "HHH",      grid,             {0} }, */
-/* 	#endif */
-/* 	#if HORIZGRID_LAYOUT */
-/* 	{ "---",      horizgrid,        {0} }, */
-/* 	#endif */
-/* 	#if GAPPLESSGRID_LAYOUT */
-/* 	{ ":::",      gaplessgrid,      {0} }, */
-/* 	#endif */
-/* 	#if NROWGRID_LAYOUT */
-/* 	{ "###",      nrowgrid,         {0} }, */
-/* 	#endif */
-/* 	#if CYCLELAYOUTS_PATCH */
-/* 	{ NULL,       NULL,             {0} }, */
-/* 	#endif */
-/* }; */
-/* #else */
+#if FLEXTILE_DELUXE_LAYOUT
+static const Layout layouts[] = {
+	/* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis, symbol func } */
+	{ "[]=",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+ 	{ "><>",      NULL,             {0} },    /* no layout function means floating behavior */
+	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, MONOCLE, 0, NULL } }, // monocle
+	{ "|||",      flextile,         { -1, -1, SPLIT_VERTICAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, NULL } }, // columns (col) layout
+	{ ">M>",      flextile,         { -1, -1, FLOATING_MASTER, LEFT_TO_RIGHT, LEFT_TO_RIGHT, 0, NULL } }, // floating master
+	{ "[D]",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
+	{ "TTT",      flextile,         { -1, -1, SPLIT_HORIZONTAL, LEFT_TO_RIGHT, LEFT_TO_RIGHT, 0, NULL } }, // bstack
+	{ "===",      flextile,         { -1, -1, SPLIT_HORIZONTAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, NULL } }, // bstackhoriz
+	{ "|M|",      flextile,         { -1, -1, SPLIT_CENTERED_VERTICAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, TOP_TO_BOTTOM, NULL } }, // centeredmaster
+	{ "-M-",      flextile,         { -1, -1, SPLIT_CENTERED_HORIZONTAL, TOP_TO_BOTTOM, LEFT_TO_RIGHT, LEFT_TO_RIGHT, NULL } }, // centeredmaster horiz
+	{ ":::",      flextile,         { -1, -1, NO_SPLIT, GAPPLESSGRID, GAPPLESSGRID, 0, NULL } }, // gappless grid
+	{ "[\\]",     flextile,         { -1, -1, NO_SPLIT, DWINDLE, DWINDLE, 0, NULL } }, // fibonacci dwindle
+	{ "(@)",      flextile,         { -1, -1, NO_SPLIT, SPIRAL, SPIRAL, 0, NULL } }, // fibonacci spiral
+	{ "[T]",      flextile,         { -1, -1, SPLIT_VERTICAL, LEFT_TO_RIGHT, TATAMI, 0, NULL } }, // tatami mats
+	#if TILE_LAYOUT
+	{ "[]=",      tile,             {0} },
+	#endif
+	#if MONOCLE_LAYOUT
+	{ "[M]",      monocle,          {0} },
+	#endif
+	#if BSTACK_LAYOUT
+	{ "TTT",      bstack,           {0} },
+	#endif
+	#if BSTACKHORIZ_LAYOUT
+	{ "===",      bstackhoriz,      {0} },
+	#endif
+	#if CENTEREDMASTER_LAYOUT
+	{ "|M|",      centeredmaster,   {0} },
+	#endif
+	#if CENTEREDFLOATINGMASTER_LAYOUT
+	{ ">M>",      centeredfloatingmaster, {0} },
+	#endif
+	#if COLUMNS_LAYOUT
+	{ "|||",      col,              {0} },
+	#endif
+	#if DECK_LAYOUT
+	{ "[D]",      deck,             {0} },
+	#endif
+	#if FIBONACCI_SPIRAL_LAYOUT
+	{ "(@)",      spiral,           {0} },
+	#endif
+	#if FIBONACCI_DWINDLE_LAYOUT
+	{ "[\\]",     dwindle,          {0} },
+	#endif
+	#if GRIDMODE_LAYOUT
+	{ "HHH",      grid,             {0} },
+	#endif
+	#if HORIZGRID_LAYOUT
+	{ "---",      horizgrid,        {0} },
+	#endif
+	#if GAPPLESSGRID_LAYOUT
+	{ ":::",      gaplessgrid,      {0} },
+	#endif
+	#if NROWGRID_LAYOUT
+	{ "###",      nrowgrid,         {0} },
+	#endif
+	#if CYCLELAYOUTS_PATCH
+	{ NULL,       NULL,             {0} },
+	#endif
+};
+#else
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	#if TILE_LAYOUT
 	{ "[]=",      tile },    /* first entry is default */
 	#endif
+	{ "><>",      NULL },    /* no layout function means floating behavior */
 	#if MONOCLE_LAYOUT
 	{ "[M]",      monocle },
+	#endif
+	#if BSTACK_LAYOUT
+	{ "TTT",      bstack },
+	#endif
+	#if BSTACKHORIZ_LAYOUT
+	{ "===",      bstackhoriz },
+	#endif
+	#if CENTEREDMASTER_LAYOUT
+	{ "|M|",      centeredmaster },
 	#endif
 	#if CENTEREDFLOATINGMASTER_LAYOUT
 	{ ">M>",      centeredfloatingmaster },
 	#endif
+	#if COLUMNS_LAYOUT
+	{ "|||",      col },
+	#endif
 	#if DECK_LAYOUT
 	{ "[D]",      deck },
-	#endif
-	#if FIBONACCI_DWINDLE_LAYOUT
-	{ "[\\]",     dwindle },
-	#endif
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-
-	#if CENTEREDMASTER_LAYOUT
-	{ "|M|",      centeredmaster },
 	#endif
 	#if FIBONACCI_SPIRAL_LAYOUT
 	{ "(@)",      spiral },
 	#endif
-	#if COLUMNS_LAYOUT
-	{ "|||",      col },
+	#if FIBONACCI_DWINDLE_LAYOUT
+	{ "[\\]",     dwindle },
 	#endif
 	#if GRIDMODE_LAYOUT
 	{ "HHH",      grid },
@@ -615,17 +633,11 @@ static const Layout layouts[] = {
 	#if NROWGRID_LAYOUT
 	{ "###",      nrowgrid },
 	#endif
-	#if BSTACK_LAYOUT
-	{ "TTT",      bstack },
-	#endif
-	#if BSTACKHORIZ_LAYOUT
-	{ "===",      bstackhoriz },
-	#endif
 	#if CYCLELAYOUTS_PATCH
 	{ NULL,       NULL },
 	#endif
 };
-/* #endif // FLEXTILE_DELUXE_LAYOUT */
+#endif // FLEXTILE_DELUXE_LAYOUT
 
 /* key definitions */
 #define MODKEY Mod4Mask
@@ -756,6 +768,11 @@ static Key keys[] = {
 /* { MODKEY,                       XK_Escape,     spawn,                  {.v = dmenucmd } }, */
 	{ MODKEY,                       XK_Tab,        spawn,                  {.v = dmenucmd } },
 	{ MODKEY,                       XK_t,          spawn,                  {.v = termcmd } },
+	#if RIODRAW_PATCH
+	{ MODKEY|ControlMask,           XK_p,          riospawnsync,           {.v = dmenucmd } },
+	{ MODKEY|ControlMask,           XK_Return,     riospawn,               {.v = termcmd } },
+	{ MODKEY,                       XK_s,          rioresize,              {0} },
+	#endif // RIODRAW_PATCH
 	{ MODKEY,                       XK_b,          togglebar,              {0} },
 	#if FOCUSMASTER_PATCH
 	{ MODKEY|ControlMask,           XK_space,      focusmaster,            {0} },
@@ -767,6 +784,12 @@ static Key keys[] = {
 	{ MODKEY,                       XK_j,          focusstack,             {.i = +1 } },
 	{ MODKEY,                       XK_k,          focusstack,             {.i = -1 } },
 	#endif // STACKER_PATCH
+	#if FOCUSDIR_PATCH
+	{ MODKEY,                       XK_Left,       focusdir,               {.i = 0 } }, // left
+	{ MODKEY,                       XK_Right,      focusdir,               {.i = 1 } }, // right
+	{ MODKEY,                       XK_Up,         focusdir,               {.i = 2 } }, // up
+	{ MODKEY,                       XK_Down,       focusdir,               {.i = 3 } }, // down
+	#endif // FOCUSDIR_PATCH
 	#if SWAPFOCUS_PATCH && PERTAG_PATCH
 	{ MODKEY,                       XK_s,          swapfocus,              {.i = -1 } },
 	#endif // SWAPFOCUS_PATCH
@@ -847,7 +870,7 @@ static Key keys[] = {
 	/* { MODKEY|Mod4Mask,              XK_9,          incrovgaps,             {.i = +1 } }, */
 	/* { MODKEY|Mod4Mask|ShiftMask,    XK_9,          incrovgaps,             {.i = -1 } }, */
 	{ MODKEY,                                  XK_BackSpace,          togglegaps,             {0} },
-	{ MODKEY|ShiftMask,                        XK_BackSpace,          defaultgaps,            {0} },
+	{ MODKEY|ShiftMask,                        XK_Escape,          defaultgaps,            {0} },
 	#endif // VANITYGAPS_PATCH
 	/* { MODKEY,                       XK_Tab,        view,                   {0} }, */
 	#if SHIFTVIEW_PATCH
@@ -1143,7 +1166,11 @@ static Button buttons[] = {
 	{ ClkButton,            0,                   Button1,        spawn,          {.v = dmenucmd } },
 	#endif // BAR_STATUSBUTTON_PATCH
 	{ ClkLtSymbol,          0,                   Button1,        setlayout,      {0} },
+	#if BAR_LAYOUTMENU_PATCH
+	{ ClkLtSymbol,          0,                   Button3,        layoutmenu,     {0} },
+	#else
 	{ ClkLtSymbol,          0,                   Button3,        setlayout,      {.v = &layouts[2]} },
+	#endif // BAR_LAYOUTMENU_PATCH
 	#if BAR_WINTITLEACTIONS_PATCH
 	{ ClkWinTitle,          0,                   Button1,        togglewin,      {0} },
 	{ ClkWinTitle,          0,                   Button3,        showhideclient, {0} },
@@ -1160,7 +1187,21 @@ static Button buttons[] = {
 	#else
 	{ ClkStatusText,        0,                   Button2,        spawn,          {.v = termcmd } },
 	#endif // BAR_STATUSCMD_PATCH
+	#if PLACEMOUSE_PATCH
+	/* placemouse options, choose which feels more natural:
+	 *    0 - tiled position is relative to mouse cursor
+	 *    1 - tiled postiion is relative to window center
+	 *    2 - mouse pointer warps to window center
+	 *
+	 * The moveorplace uses movemouse or placemouse depending on the floating state
+	 * of the selected client. Set up individual keybindings for the two if you want
+	 * to control these separately (i.e. to retain the feature to move a tiled window
+	 * into a floating position).
+	 */
+	{ ClkClientWin,         MODKEY,              Button1,        moveorplace,    {.i = 1} },
+	#else
 	{ ClkClientWin,         MODKEY,              Button1,        movemouse,      {0} },
+	#endif // PLACEMOUSE_PATCH
 	{ ClkClientWin,         MODKEY,              Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,              Button3,        resizemouse,    {0} },
 	#if DRAGCFACT_PATCH && CFACTS_PATCH
@@ -1431,6 +1472,9 @@ static IPCCommand ipccommands[] = {
 	#if MOVERESIZE_PATCH
 	IPCCOMMAND( moveresize, 1, {ARG_TYPE_STR} ),
 	#endif // MOVERESIZE_PATCH
+	#if RIODRAW_PATCH
+	IPCCOMMAND( rioresize, 1, {ARG_TYPE_NONE} ),
+	#endif // RIODRAW_PATCH
 	#if PUSH_PATCH || PUSH_NO_MASTER_PATCH
 	IPCCOMMAND( pushdown, 1, {ARG_TYPE_NONE} ),
 	IPCCOMMAND( pushup, 1, {ARG_TYPE_NONE} ),

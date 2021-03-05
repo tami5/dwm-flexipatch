@@ -26,7 +26,7 @@
  * Patch: https://gist.github.com/danbyl/54f7c1d57fc6507242a95b71c3d8fdea
  * dwmblocks: https://github.com/torrinfail/dwmblocks
  */
-#define BAR_DWMBLOCKS_PATCH 1
+#define BAR_DWMBLOCKS_PATCH 0
 
 /* This patch shows the titles of all visible windows in the status bar
  * (as opposed to showing only the selected one).
@@ -41,6 +41,15 @@
  * title section in the bar that is representative of what is shown on screen.
  */
 #define BAR_FLEXWINTITLE_PATCH 0
+
+/* This patch adds a context menu for layout switching.
+ *   - xmenu needs to be installed.
+ *   - Edit layoutmenu.sh with the installed layouts and with correct indexes.
+ *   - Place layoutmenu.sh in PATH.
+ *   - The text of the menu items is for display only. Name them however you want.
+ * https://dwm.suckless.org/patches/layoutmenu/
+ */
+#define BAR_LAYOUTMENU_PATCH 0
 
 /* Show layout symbol in bar */
 #define BAR_LTSYMBOL_PATCH 1
@@ -511,6 +520,11 @@
  */
 #define FOCUSADJACENTTAG_PATCH 0
 
+/* Allows focusing on clients based on direction (up, down, left, right) instead of client order.
+ * https://github.com/bakkeby/patches/wiki/focusdir/
+ */
+#define FOCUSDIR_PATCH 0
+
 /* A simple patch that just puts focus back to the master client.
  * https://dwm.suckless.org/patches/focusmaster/
  */
@@ -712,6 +726,11 @@
  */
 #define PERTAGBAR_PATCH 0
 
+/* This patch lets you change the position of a client in the stack using the mouse.
+ * https://github.com/bakkeby/patches/wiki/placemouse
+ */
+#define PLACEMOUSE_PATCH 0
+
 /* This patch provides a way to move clients up and down inside the client list.
  * https://dwm.suckless.org/patches/push/
  */
@@ -754,6 +773,13 @@
  * https://dwm.suckless.org/patches/restartsig/
  */
 #define RESTARTSIG_PATCH 1
+
+/* Adds rio-like drawing to resize the selected client.
+ * This depends on an external tool slop being installed.
+ * This patch was backported from instantWM.
+ * https://github.com/bakkeby/patches/blob/master/dwm/dwm-riodraw-6.2.diff
+ */
+#define RIODRAW_PATCH 0
 
 /* This patch let's you rotate through the stack using keyboard shortcuts.
  * https://dwm.suckless.org/patches/rotatestack/
@@ -888,17 +914,22 @@
  * Clients marked with isterminal in config.h swallow a window opened by any child process,
  * e.g. running xclock in a terminal. Closing the xclock window restores the terminal window
  * in the current position.
- * https://dwm.suckless.org/patches/swallow/
- */
-#define SWALLOW_PATCH 1
-
-/* This patch depends on the pertag patch and makes it possible to switch focus with a single
- * shortcut (MOD+s) instead of having to think if you should use mod-j or mod-k for reaching
- * the previously used window.
+ *
  * This patch depends on the following additional libraries:
  *    - libxcb
  *    - Xlib-libxcb
  *    - xcb-res
+ *
+ * You need to uncomment the corresponding line in config.mk to use the above libraries when
+ * including this patch.
+ *
+ * https://dwm.suckless.org/patches/swallow/
+ */
+ */
+#define SWALLOW_PATCH 1
+/* This patch depends on the pertag patch and makes it possible to switch focus with a single
+ * shortcut (MOD+s) instead of having to think if you should use mod-j or mod-k for reaching
+ * the previously used window.
  * https://dwm.suckless.org/patches/swapfocus/
  */
 #define SWAPFOCUS_PATCH 0
